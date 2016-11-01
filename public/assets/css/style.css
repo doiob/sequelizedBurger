@@ -1,0 +1,14 @@
+body {
+  background: #dde76c;
+  text-align: center;
+  padding: 5px;
+}
+
+.label {
+  font-weight: bold;
+}
+
+#center{
+	margin-left: 30%;
+	margin-right:30%;
+} 
