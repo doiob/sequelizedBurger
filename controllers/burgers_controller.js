@@ -3,7 +3,7 @@ Here is where you create all the functions that will do the routing for your app
 */
 var express = require('express');
 var router = express.Router();
-var burger = require('../models/burger.js');
+var models = require('../models')
  
 var moment = require('moment');
 
@@ -11,30 +11,32 @@ router.get('/', function (req, res) {
 	res.redirect('/burgers');
 });
 
+var hbsObject;
 router.get('/burgers', function (req, res) {
-	burger.all(function (data) {
-		var hbsObject = { burgers: data };
-		console.log(hbsObject);
-		res.render('index', hbsObject);
-	});
-});
+	models.burgers.findAll({
+  attributes: ['id','burger_name', 'devoured']
+})
+.then (function(data){
+	var ary=[];
+	
+	 data.forEach(function(row){return ary.push(row.get())})
+	console.log(ary)
+	var hbsObject = { burgers: data };
+		res.render('index',hbsObject );
+	})
+})	
 
 router.post('/burgers/create', function (req, res) {
 	var d = moment().format('YYYY-MM-DD')
-
-	burger.create(['burger_name', 'devoured','day'], [req.body.burger_name, req.body.devoured,d], function () {
-		res.redirect('/burgers');
-	});
+	models.burgers.create({'burger_name':req.body.burger_name, 'devoured':false,'day':d}).then(function() {})
+	res.redirect('/burgers');
 });
 
 router.put('/burgers/update/:id', function (req, res) {
 	var condition = 'id = ' + req.params.id;
 
-	console.log('condition', condition);
-
-	burger.update({ devoured: req.body.devoured }, condition, function () {
-		res.redirect('/burgers');
-	});
+	models.burgers.update({ devoured: req.body.devoured },{ where :{id:req.params.id}}, function () {});
+	res.redirect('/burgers');
 });
 
 module.exports = router;
